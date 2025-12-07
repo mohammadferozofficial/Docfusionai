@@ -1,14 +1,1006 @@
-<!doctype html>
+              <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>DocFusion AI</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DocFusion AI | Write. Generate. Download. Done.</title>
+    <meta name="description" content="AI-powered document creation platform for resumes, contracts, letters, and more. Generate professional documents in seconds.">
+    <!-- SEO & OpenGraph -->
+    <meta property="og:title" content="DocFusion AI: Write. Generate. Download. Done.">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary_large_image">
+
+    <!-- Load Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Load Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" xintegrity="sha512-SnH5WK+bZxgPHs44uWIX+LLMDJzLwR8AERy4P0TA9sY/Nal8Z4D7wT5Q+d5V2D3Vp1F8P1z4P3e5M0R/5w==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <style>
+        /* Base styles using Inter font (Tailwind default) */
+        body {
+            font-family: 'Inter', sans-serif;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .ai-gradient-bg {
+            background: linear-gradient(135deg, #4f46e5 0%, #a855f7 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .animated-gradient-border {
+            border: 2px solid transparent;
+            background: linear-gradient(white, white) padding-box, linear-gradient(to right, #4f46e5, #a855f7) border-box;
+            border-radius: 0.5rem;
+            transition: all 0.3s;
+        }
+        .dark .animated-gradient-border {
+             background: linear-gradient(#1f2937, #1f2937) padding-box, linear-gradient(to right, #4f46e5, #a855f7) border-box;
+        }
+        /* Rich Text Editor Simulation Styles */
+        #doc-editor-content {
+            white-space: pre-wrap; /* Preserves formatting from AI output */
+            min-height: 400px;
+        }
+        .page-content {
+            min-height: calc(100vh - 128px); /* Full height minus fixed header/footer */
+        }
+    </style>
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        'primary': '#4f46e5', /* Indigo */
+                        'secondary': '#a855f7', /* Purple */
+                        'dark-bg': '#1f2937', /* Dark Gray */
+                        'dark-card': '#374151', /* Medium Gray */
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gray-50 dark:bg-dark-bg text-gray-800 dark:text-gray-200">
+
+    <!-- Global App State -->
+    <div id="app-root">
+
+        <!-- 1. Navbar -->
+        <nav class="sticky top-0 z-50 bg-white dark:bg-dark-bg border-b border-gray-200 dark:border-gray-700 shadow-md">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex items-center justify-between h-16">
+                    <div class="flex items-center">
+                        <button onclick="navigate('home')" class="flex-shrink-0 flex items-center space-x-2">
+                            <i class="fas fa-magic text-primary text-2xl"></i>
+                            <span class="text-2xl font-bold tracking-tight text-gray-900 dark:text-white">DocFusion <span class="ai-gradient-bg">AI</span></span>
+                        </button>
+                    </div>
+                    <div class="hidden md:block">
+                        <div class="ml-10 flex items-center space-x-4">
+                            <button onclick="navigate('builder')" class="text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-secondary px-3 py-2 rounded-md text-sm font-medium transition">
+                                Document Builder
+                            </button>
+                            <button onclick="navigate('templates')" class="text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-secondary px-3 py-2 rounded-md text-sm font-medium transition">
+                                Templates
+                            </button>
+                            <button onclick="navigate('pricing')" class="text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-secondary px-3 py-2 rounded-md text-sm font-medium transition">
+                                Pricing
+                            </button>
+                            <button onclick="navigate('tools')" class="text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-secondary px-3 py-2 rounded-md text-sm font-medium transition">
+                                AI Tools
+                            </button>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-3">
+                        <!-- Dark Mode Toggle -->
+                        <button id="dark-mode-toggle" class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition">
+                            <i class="fas fa-sun text-yellow-500 dark:hidden"></i>
+                            <i class="fas fa-moon text-indigo-400 hidden dark:inline"></i>
+                        </button>
+
+                        <!-- Auth/Dashboard Button -->
+                        <button onclick="navigate('dashboard')" id="auth-button" class="bg-primary hover:bg-indigo-700 text-white font-semibold py-1.5 px-4 rounded-lg shadow-md transition duration-200 text-sm">
+                            <i class="fas fa-user-circle mr-1"></i> Account
+                        </button>
+
+                        <!-- Mobile Menu Button -->
+                        <button id="mobile-menu-button" class="md:hidden p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition">
+                            <i class="fas fa-bars text-xl"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <!-- Mobile Menu -->
+            <div class="md:hidden hidden" id="mobile-menu">
+                <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                    <button onclick="navigate('builder')" class="block w-full text-left text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-dark-card hover:text-primary dark:hover:text-secondary px-3 py-2 rounded-md text-base font-medium transition">Document Builder</button>
+                    <button onclick="navigate('templates')" class="block w-full text-left text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-dark-card hover:text-primary dark:hover:text-secondary px-3 py-2 rounded-md text-base font-medium transition">Templates</button>
+                    <button onclick="navigate('pricing')" class="block w-full text-left text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-dark-card hover:text-primary dark:hover:text-secondary px-3 py-2 rounded-md text-base font-medium transition">Pricing</button>
+                    <button onclick="navigate('tools')" class="block w-full text-left text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-dark-card hover:text-primary dark:hover:text-secondary px-3 py-2 rounded-md text-base font-medium transition">AI Tools</button>
+                </div>
+            </div>
+        </nav>
+
+        <!-- 2. Main Content Area (Pages are dynamically loaded/hidden) -->
+        <main class="page-content py-12">
+
+            <!-- PAGE: HOME -->
+            <section id="page-home" class="page max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center" data-page="home">
+                <div class="relative overflow-hidden pt-12 pb-20 rounded-xl shadow-2xl dark:shadow-none bg-white dark:bg-dark-card/50 backdrop-blur-sm">
+                     <!-- Animated Background Gradient Overlay -->
+                    <div class="absolute inset-0 opacity-10 dark:opacity-20 pointer-events-none">
+                        <div class="w-full h-full bg-[radial-gradient(ellipse_at_top,_var(--tw-color-primary)_0%,_transparent_50%),_radial-gradient(ellipse_at_bottom,_var(--tw-color-secondary)_0%,_transparent_50%)] animate-pulse-slow"></div>
+                    </div>
+
+                    <div class="relative z-10">
+                        <p class="text-lg font-semibold text-primary mb-3">#1 AI Document Generation Platform</p>
+                        <h1 class="text-6xl md:text-8xl font-extrabold mb-6 tracking-tighter">
+                            <span class="text-gray-900 dark:text-white">DocFusion </span><span class="ai-gradient-bg">AI</span>
+                        </h1>
+                        <p class="text-2xl md:text-3xl font-light text-gray-600 dark:text-gray-400 mb-10 max-w-3xl mx-auto">
+                            <strong class="font-bold">Write. Generate. Download. Done.</strong>
+                            Create professional Resumes, Contracts, and Legal Letters in seconds.
+                        </p>
+                        <button onclick="navigate('builder')" class="bg-primary hover:bg-indigo-700 text-white text-xl font-bold py-4 px-8 rounded-xl shadow-lg transform hover:scale-105 transition duration-300">
+                            Start Generating Documents <i class="fas fa-arrow-right ml-2"></i>
+                        </button>
+                        <div class="mt-16 flex justify-center items-center space-x-6 text-gray-500 dark:text-gray-400 text-sm">
+                            <span class="font-semibold">Trusted by:</span>
+                            <i class="fab fa-google text-2xl hover:text-primary transition"></i>
+                            <i class="fab fa-apple text-2xl hover:text-primary transition"></i>
+                            <i class="fab fa-stripe text-2xl hover:text-primary transition"></i>
+                        </div>
+                    </div>
+                </div>
+                <!-- Feature Grid -->
+                <div class="mt-20 grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div class="p-6 bg-white dark:bg-dark-card rounded-xl shadow-xl border border-gray-100 dark:border-gray-700">
+                        <i class="fas fa-robot text-4xl text-secondary mb-4"></i>
+                        <h3 class="text-xl font-bold mb-2">AI Smart Generator</h3>
+                        <p class="text-gray-500 dark:text-gray-400">Turn simple inputs into fully structured, formatted documents.</p>
+                    </div>
+                    <div class="p-6 bg-white dark:bg-dark-card rounded-xl shadow-xl border border-gray-100 dark:border-gray-700">
+                        <i class="fas fa-edit text-4xl text-secondary mb-4"></i>
+                        <h3 class="text-xl font-bold mb-2">Real-time Editor</h3>
+                        <p class="text-gray-500 dark:text-gray-400">Edit, proofread, rewrite, and change tone directly in the canvas.</p>
+                    </div>
+                    <div class="p-6 bg-white dark:bg-dark-card rounded-xl shadow-xl border border-gray-100 dark:border-gray-700">
+                        <i class="fas fa-file-export text-4xl text-secondary mb-4"></i>
+                        <h3 class="text-xl font-bold mb-2">Multi-Format Export</h3>
+                        <p class="text-gray-500 dark:text-gray-400">Download as PDF, DOCX, TXT, or copy directly to email.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- PAGE: DOCUMENT BUILDER (MAIN TOOL) -->
+            <section id="page-builder" class="page hidden max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" data-page="builder">
+                <h2 class="text-3xl font-bold mb-8 text-center">AI Smart Document Generator</h2>
+
+                <div class="flex flex-col lg:flex-row gap-8">
+                    <!-- Builder Sidebar (AI Inputs) -->
+                    <div class="lg:w-1/3 p-6 bg-white dark:bg-dark-card rounded-xl shadow-lg h-full sticky top-20">
+                        <h3 class="text-xl font-semibold mb-6 border-b pb-3 border-gray-200 dark:border-gray-600">Document Parameters</h3>
+                        
+                        <div class="space-y-4">
+                            <div>
+                                <label for="doc-type" class="block text-sm font-medium mb-1">Document Type</label>
+                                <select id="doc-type" class="w-full p-2.5 rounded-lg border bg-gray-50 dark:bg-gray-700 border-gray-300 dark:border-gray-600 focus:ring-primary focus:border-primary transition">
+                                    <option>Resume / CV</option>
+                                    <option>Cover Letter</option>
+                                    <option>Contract</option>
+                                    <option>Job Offer Letter</option>
+                                    <option>Legal Agreement (NDA)</option>
+                                    <option>Academic Letter (SOP)</option>
+                                    <option>Freelancing Invoice</option>
+                                    <option>Complaint Letter</option>
+                                    <option>Business Proposal</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="doc-role" class="block text-sm font-medium mb-1">Your Role / Job Title</label>
+                                <input type="text" id="doc-role" placeholder="e.g., Senior Full-Stack Developer" class="w-full p-2.5 rounded-lg border bg-gray-50 dark:bg-gray-700 border-gray-300 dark:border-gray-600 focus:ring-primary focus:border-primary transition" />
+                            </div>
+                            <div>
+                                <label for="doc-industry" class="block text-sm font-medium mb-1">Industry / Field</label>
+                                <input type="text" id="doc-industry" placeholder="e.g., Fintech" class="w-full p-2.5 rounded-lg border bg-gray-50 dark:bg-gray-700 border-gray-300 dark:border-gray-600 focus:ring-primary focus:border-primary transition" />
+                            </div>
+                            <div>
+                                <label for="doc-tone" class="block text-sm font-medium mb-1">Tone of Voice</label>
+                                <select id="doc-tone" class="w-full p-2.5 rounded-lg border bg-gray-50 dark:bg-gray-700 border-gray-300 dark:border-gray-600 focus:ring-primary focus:border-primary transition">
+                                    <option>Executive / Professional</option>
+                                    <option>Formal / Legal</option>
+                                    <option>Friendly / Casual</option>
+                                    <option>Confident / Assertive</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="doc-details" class="block text-sm font-medium mb-1">Key Details / Prompt</label>
+                                <textarea id="doc-details" rows="4" placeholder="e.g., 5 years experience, launched 3 products, skills: React, Node, AWS." class="w-full p-2.5 rounded-lg border bg-gray-50 dark:bg-gray-700 border-gray-300 dark:border-gray-600 focus:ring-primary focus:border-primary transition"></textarea>
+                            </div>
+                        </div>
+
+                        <button id="generate-button" onclick="handleAIGenerate()" class="w-full mt-6 bg-secondary hover:bg-purple-700 text-white font-bold py-3 rounded-lg shadow-md transform hover:scale-[1.02] transition duration-200 disabled:opacity-50" disabled>
+                            Generate Document <i class="fas fa-wand-magic-sparkles ml-1"></i>
+                        </button>
+
+                        <!-- Placeholder for Free Plan Limit -->
+                        <p class="text-xs text-center text-gray-400 mt-3" id="free-limit-status">
+                            Free Plan: 3/3 daily generations used. <a href="#" onclick="navigate('pricing')" class="text-primary hover:underline">Upgrade to Pro.</a>
+                        </p>
+                    </div>
+
+                    <!-- Editor Area -->
+                    <div class="lg:w-2/3">
+                        <!-- AI Rewrite Toolbar -->
+                        <div class="flex flex-wrap gap-2 mb-4 p-4 bg-white dark:bg-dark-card rounded-xl shadow-lg border border-gray-100 dark:border-gray-700">
+                            <span class="text-sm font-medium mr-2 self-center">AI Rewrite Tools:</span>
+                            <button onclick="handleAITool('proofread')" class="tool-btn">
+                                <i class="fas fa-spell-check mr-1"></i> Proofread
+                            </button>
+                            <button onclick="handleAITool('formal')" class="tool-btn">
+                                <i class="fas fa-handshake mr-1"></i> Formal Tone
+                            </button>
+                            <button onclick="handleAITool('shorten')" class="tool-btn">
+                                <i class="fas fa-compress-alt mr-1"></i> Shorten
+                            </button>
+                            <button onclick="handleAITool('expand')" class="tool-btn">
+                                <i class="fas fa-expand-alt mr-1"></i> Expand
+                            </button>
+                             <button onclick="handleAITool('format')" class="tool-btn">
+                                <i class="fas fa-list-ol mr-1"></i> AI Format
+                            </button>
+                        </div>
+
+                        <!-- Document Editor -->
+                        <div class="p-8 bg-white dark:bg-dark-bg border dark:border-gray-700 rounded-xl shadow-2xl">
+                            <div id="doc-editor-content" contenteditable="true" spellcheck="true" 
+                                class="prose dark:prose-invert max-w-none focus:outline-none min-h-[500px] bg-white dark:bg-dark-bg text-gray-800 dark:text-gray-200">
+                                <h1 class="text-3xl font-bold">Welcome to DocFusion AI</h1>
+                                <p class="text-lg mt-4">Use the sidebar to input your document requirements. Click 'Generate Document' to start creating your professional content instantly.</p>
+                                <p class="text-sm italic text-gray-500 dark:text-gray-400 mt-8">Note: This is a simulation. In a live environment, this field would be a full-featured rich text editor (e.g., Tiptap/Quill).</p>
+                                
+                                <div id="ai-loading" class="hidden text-center mt-12">
+                                    <div class="animate-spin inline-block w-8 h-8 border-4 border-t-4 border-primary rounded-full border-t-transparent"></div>
+                                    <p class="mt-4 text-primary font-semibold">Generating professional document structure...</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Export Options -->
+                        <div class="mt-6 flex flex-wrap justify-end gap-3 p-4 bg-white dark:bg-dark-card rounded-xl shadow-lg border border-gray-100 dark:border-gray-700">
+                            <button onclick="handleExport('copy')" class="export-btn bg-gray-200 dark:bg-gray-600 hover:bg-gray-300 dark:hover:bg-gray-500 text-gray-800 dark:text-gray-200">
+                                <i class="fas fa-copy mr-1"></i> Copy Text
+                            </button>
+                            <button onclick="handleExport('docx')" class="export-btn bg-blue-500 hover:bg-blue-600">
+                                <i class="fas fa-file-word mr-1"></i> Export DOCX
+                            </button>
+                            <button onclick="handleExport('pdf')" class="export-btn bg-red-500 hover:bg-red-600">
+                                <i class="fas fa-file-pdf mr-1"></i> Export PDF
+                            </button>
+                            <button onclick="handleExport('txt')" class="export-btn bg-green-500 hover:bg-green-600">
+                                <i class="fas fa-file-alt mr-1"></i> Export TXT
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- PAGE: TEMPLATE LIBRARY -->
+            <section id="page-templates" class="page hidden max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" data-page="templates">
+                <h2 class="text-3xl font-bold mb-8 text-center">Professional Template Library (100+ Templates)</h2>
+                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                    <!-- Template Card 1 -->
+                    <div class="bg-white dark:bg-dark-card p-4 rounded-xl shadow-md animated-gradient-border group cursor-pointer hover:shadow-xl transition" onclick="selectTemplate('Resume - Executive')">
+                        <i class="fas fa-user-tie text-3xl text-primary mb-3"></i>
+                        <h4 class="font-semibold text-lg group-hover:text-primary transition">Executive Resume</h4>
+                        <p class="text-sm text-gray-500 dark:text-gray-400">Formal design for C-level roles.</p>
+                        <span class="text-xs mt-2 inline-block text-white bg-primary px-2 py-0.5 rounded-full">HR</span>
+                    </div>
+                    <!-- Template Card 2 -->
+                    <div class="bg-white dark:bg-dark-card p-4 rounded-xl shadow-md animated-gradient-border group cursor-pointer hover:shadow-xl transition" onclick="selectTemplate('Legal - NDA')">
+                        <i class="fas fa-gavel text-3xl text-primary mb-3"></i>
+                        <h4 class="font-semibold text-lg group-hover:text-primary transition">Standard NDA</h4>
+                        <p class="text-sm text-gray-500 dark:text-gray-400">Non-Disclosure Agreement template.</p>
+                        <span class="text-xs mt-2 inline-block text-white bg-red-500 px-2 py-0.5 rounded-full">Legal</span>
+                    </div>
+                    <!-- Template Card 3 -->
+                    <div class="bg-white dark:bg-dark-card p-4 rounded-xl shadow-md animated-gradient-border group cursor-pointer hover:shadow-xl transition" onclick="selectTemplate('Freelance - Invoice')">
+                        <i class="fas fa-file-invoice-dollar text-3xl text-primary mb-3"></i>
+                        <h4 class="font-semibold text-lg group-hover:text-primary transition">Modern Invoice</h4>
+                        <p class="text-sm text-gray-500 dark:text-gray-400">Clean, billable hours tracking.</p>
+                        <span class="text-xs mt-2 inline-block text-white bg-yellow-500 px-2 py-0.5 rounded-full">Finance</span>
+                    </div>
+                     <!-- Template Card 4 -->
+                    <div class="bg-white dark:bg-dark-card p-4 rounded-xl shadow-md animated-gradient-border group cursor-pointer hover:shadow-xl transition" onclick="selectTemplate('Academic - SOP')">
+                        <i class="fas fa-graduation-cap text-3xl text-primary mb-3"></i>
+                        <h4 class="font-semibold text-lg group-hover:text-primary transition">Statement of Purpose</h4>
+                        <p class="text-sm text-gray-500 dark:text-gray-400">Academic application letter structure.</p>
+                        <span class="text-xs mt-2 inline-block text-white bg-green-500 px-2 py-0.5 rounded-full">Academic</span>
+                    </div>
+                    <!-- Add more placeholder cards... -->
+                    <div class="bg-white dark:bg-dark-card p-4 rounded-xl shadow-md animated-gradient-border group cursor-pointer transition">
+                        <i class="fas fa-briefcase text-3xl text-primary mb-3"></i>
+                        <h4 class="font-semibold text-lg">Job Offer Letter</h4>
+                        <p class="text-sm text-gray-500 dark:text-gray-400">Standard employment contract template.</p>
+                    </div>
+                    <div class="bg-white dark:bg-dark-card p-4 rounded-xl shadow-md animated-gradient-border group cursor-pointer transition">
+                        <i class="fas fa-scale-balanced text-3xl text-primary mb-3"></i>
+                        <h4 class="font-semibold text-lg">Service Agreement</h4>
+                        <p class="text-sm text-gray-500 dark:text-gray-400">Consulting or freelance service terms.</p>
+                    </div>
+                    <div class="bg-white dark:bg-dark-card p-4 rounded-xl shadow-md animated-gradient-border group cursor-pointer transition">
+                        <i class="fas fa-headset text-3xl text-primary mb-3"></i>
+                        <h4 class="font-semibold text-lg">Complaint Letter</h4>
+                        <p class="text-sm text-gray-500 dark:text-gray-400">Formal consumer complaint structure.</p>
+                    </div>
+                     <div class="bg-white dark:bg-dark-card p-4 rounded-xl shadow-md animated-gradient-border group cursor-pointer transition">
+                        <i class="fas fa-file-signature text-3xl text-primary mb-3"></i>
+                        <h4 class="font-semibold text-lg">Experience Certificate</h4>
+                        <p class="text-sm text-gray-500 dark:text-gray-400">HR format for employment verification.</p>
+                    </div>
+                </div>
+                <div class="text-center mt-12">
+                     <button onclick="navigate('builder')" class="text-primary hover:text-secondary font-semibold transition">
+                        Browse All 100+ Templates <i class="fas fa-arrow-right ml-1"></i>
+                    </button>
+                </div>
+            </section>
+            
+            <!-- PAGE: AI TOOLS -->
+            <section id="page-tools" class="page hidden max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" data-page="tools">
+                <h2 class="text-3xl font-bold mb-8 text-center">DocFusion AI Rewrite Tools</h2>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <!-- Proofread & Grammar -->
+                    <div class="p-6 bg-white dark:bg-dark-card rounded-xl shadow-lg border border-gray-100 dark:border-gray-700">
+                        <i class="fas fa-pen-fancy text-4xl text-primary mb-4"></i>
+                        <h3 class="text-2xl font-bold mb-3">Proofread & Grammar Check</h3>
+                        <p class="text-gray-500 dark:text-gray-400 mb-4">Submit any text snippet to instantly correct spelling, grammar, and punctuation for a professional finish.</p>
+                        <textarea id="tool-input-1" rows="3" placeholder="Paste your text here..." class="w-full p-2.5 rounded-lg border bg-gray-50 dark:bg-gray-700 border-gray-300 dark:border-gray-600 focus:ring-primary focus:border-primary transition"></textarea>
+                        <button onclick="handleAIToolStandalone('proofread')" class="mt-4 w-full bg-primary hover:bg-indigo-700 text-white font-semibold py-2 rounded-lg">
+                            Run Proofread
+                        </button>
+                    </div>
+                    
+                    <!-- Tone Transformer -->
+                    <div class="p-6 bg-white dark:bg-dark-card rounded-xl shadow-lg border border-gray-100 dark:border-gray-700">
+                        <i class="fas fa-mask text-4xl text-secondary mb-4"></i>
+                        <h3 class="text-2xl font-bold mb-3">Tone Transformer</h3>
+                        <p class="text-gray-500 dark:text-gray-400 mb-4">Instantly change the tone of your content. Select from options like Legal, Executive, Casual, or Friendly.</p>
+                        <textarea id="tool-input-2" rows="3" placeholder="Paste your text here..." class="w-full p-2.5 rounded-lg border bg-gray-500 dark:bg-gray-700 border-gray-300 dark:border-gray-600 focus:ring-primary focus:border-primary transition"></textarea>
+                        <select id="tool-tone-select" class="w-full p-2.5 mt-2 rounded-lg border bg-gray-50 dark:bg-gray-700 border-gray-300 dark:border-gray-600 focus:ring-primary focus:border-primary transition">
+                            <option>Formal / Executive</option>
+                            <option>Legal / Compliance</option>
+                            <option>Friendly / Conversational</option>
+                        </select>
+                        <button onclick="handleAIToolStandalone('tone-transform')" class="mt-4 w-full bg-primary hover:bg-indigo-700 text-white font-semibold py-2 rounded-lg">
+                            Apply Tone
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Tool Result Display (Modal simulation) -->
+                <div id="tool-result-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[100] p-4">
+                    <div class="bg-white dark:bg-dark-card p-6 rounded-xl shadow-2xl w-full max-w-lg">
+                        <h3 class="text-xl font-bold mb-4 flex justify-between items-center">
+                            <span>AI Tool Result <i class="fas fa-check-circle text-green-500 ml-1"></i></span>
+                            <button onclick="document.getElementById('tool-result-modal').classList.add('hidden')" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </h3>
+                        <div id="tool-result-content" class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg text-sm italic">
+                            Result will appear here...
+                        </div>
+                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-3 text-right">Processed in 0.4s</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- PAGE: PRICING -->
+            <section id="page-pricing" class="page hidden max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" data-page="pricing">
+                <h2 class="text-4xl font-extrabold mb-4 text-center">Simple & Transparent Pricing</h2>
+                <p class="text-xl text-gray-600 dark:text-gray-400 mb-12 text-center">Unlock unlimited creation and powerful AI features.</p>
+                
+                <div class="flex justify-center mb-10">
+                    <div class="inline-flex rounded-full bg-gray-200 dark:bg-gray-700 p-1">
+                        <button id="monthly-toggle" class="px-5 py-2 text-sm font-medium rounded-full bg-primary text-white shadow-md transition">
+                            Monthly Billing
+                        </button>
+                        <button id="yearly-toggle" class="px-5 py-2 text-sm font-medium rounded-full text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600 transition">
+                            Yearly Billing <span class="ml-2 px-2 py-0.5 text-xs font-bold text-white bg-green-500 rounded-full">-40%</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <!-- Tier 1: Free -->
+                    <div class="p-8 bg-white dark:bg-dark-card rounded-xl shadow-xl border-2 border-gray-200 dark:border-gray-700">
+                        <h3 class="text-2xl font-bold mb-4">Free Plan</h3>
+                        <p class="text-4xl font-extrabold mb-6">
+                            $0<span class="text-base font-medium text-gray-500 dark:text-gray-400">/month</span>
+                        </p>
+                        <ul class="space-y-3 text-sm text-gray-600 dark:text-gray-300 mb-8">
+                            <li><i class="fas fa-check-circle text-green-500 mr-2"></i> 3 Document Generations / Day</li>
+                            <li><i class="fas fa-check-circle text-green-500 mr-2"></i> Basic Templates Access</li>
+                            <li><i class="fas fa-check-circle text-green-500 mr-2"></i> TXT & DOCX Export</li>
+                            <li><i class="fas fa-times-circle text-red-500 mr-2"></i> Watermarked PDF Export</li>
+                            <li><i class="fas fa-times-circle text-red-500 mr-2"></i> No AI Rewrite Tools</li>
+                        </ul>
+                        <button onclick="document.getElementById('pricing-modal').classList.remove('hidden')" class="w-full bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 font-bold py-3 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition">
+                            Start Free
+                        </button>
+                    </div>
+
+                    <!-- Tier 2: Pro -->
+                    <div class="p-8 bg-white dark:bg-dark-card rounded-xl shadow-2xl border-2 border-primary relative transform scale-[1.05]">
+                        <div class="absolute top-0 right-0 bg-primary text-white text-xs font-bold py-1 px-3 rounded-tr-xl rounded-bl-lg">
+                            MOST POPULAR
+                        </div>
+                        <h3 class="text-2xl font-bold mb-4 text-primary">Pro Plan</h3>
+                        <p id="pro-price" class="text-5xl font-extrabold mb-6">
+                            $9.99<span class="text-base font-medium text-gray-500 dark:text-gray-400">/month</span>
+                        </p>
+                        <ul class="space-y-3 text-sm text-gray-600 dark:text-gray-300 mb-8">
+                            <li><i class="fas fa-check-circle text-green-500 mr-2"></i> **Unlimited** Generation</li>
+                            <li><i class="fas fa-check-circle text-green-500 mr-2"></i> Full Template Library</li>
+                            <li><i class="fas fa-check-circle text-green-500 mr-2"></i> **AI Rewrite Tools**</li>
+                            <li><i class="fas fa-check-circle text-green-500 mr-2"></i> PDF Export (No Watermark)</li>
+                            <li><i class="fas fa-check-circle text-green-500 mr-2"></i> Save Documents to Cloud</li>
+                        </ul>
+                        <button onclick="document.getElementById('pricing-modal').classList.remove('hidden')" class="w-full bg-primary hover:bg-indigo-700 text-white font-bold py-3 rounded-lg shadow-lg transition">
+                            Subscribe via Stripe
+                        </button>
+                    </div>
+
+                    <!-- Tier 3: Business -->
+                    <div class="p-8 bg-white dark:bg-dark-card rounded-xl shadow-xl border-2 border-gray-200 dark:border-gray-700">
+                        <h3 class="text-2xl font-bold mb-4">Business Team</h3>
+                        <p class="text-4xl font-extrabold mb-6">
+                            $49.99<span class="text-base font-medium text-gray-500 dark:text-gray-400">/month</span>
+                        </p>
+                        <ul class="space-y-3 text-sm text-gray-600 dark:text-gray-300 mb-8">
+                            <li><i class="fas fa-check-circle text-green-500 mr-2"></i> Everything in Pro</li>
+                            <li><i class="fas fa-check-circle text-green-500 mr-2"></i> Multi-User Access (5 Seats)</li>
+                            <li><i class="fas fa-check-circle text-green-500 mr-2"></i> Admin Dashboard & Analytics</li>
+                            <li><i class="fas fa-check-circle text-green-500 mr-2"></i> Priority Email Support</li>
+                            <li><i class="fas fa-check-circle text-green-500 mr-2"></i> Shared Document Links</li>
+                        </ul>
+                        <button onclick="document.getElementById('pricing-modal').classList.remove('hidden')" class="w-full bg-secondary hover:bg-purple-700 text-white font-bold py-3 rounded-lg shadow-lg transition">
+                            Contact Sales
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Placeholder for Stripe Modal Simulation -->
+                <div id="pricing-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[100] p-4">
+                    <div class="bg-white dark:bg-dark-card p-8 rounded-xl shadow-2xl w-full max-w-sm text-center">
+                        <i class="fab fa-stripe text-6xl text-purple-600 mb-4"></i>
+                        <h3 class="text-xl font-bold mb-4">Stripe Checkout Simulation</h3>
+                        <p class="text-sm text-gray-600 dark:text-gray-300 mb-6">
+                            This would initiate a secure payment via Stripe.
+                        </p>
+                        <button onclick="document.getElementById('pricing-modal').classList.add('hidden')" class="w-full bg-primary hover:bg-indigo-700 text-white font-bold py-2 rounded-lg transition">
+                            Close & Continue
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- PAGE: AUTH (Login/Signup) -->
+            <section id="page-auth" class="page hidden max-w-md mx-auto px-4 sm:px-6 lg:px-8" data-page="auth">
+                <div class="bg-white dark:bg-dark-card p-8 rounded-xl shadow-2xl border border-gray-100 dark:border-gray-700">
+                    <h2 class="text-3xl font-bold mb-6 text-center">Login to DocFusion AI</h2>
+                    <div class="space-y-4">
+                        <button class="w-full py-3 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg transition flex items-center justify-center">
+                            <i class="fab fa-google mr-2 text-lg"></i> Sign in with Google
+                        </button>
+                         <button class="w-full py-3 bg-black dark:bg-gray-200 hover:bg-gray-800 dark:hover:bg-white text-white dark:text-gray-900 font-semibold rounded-lg transition flex items-center justify-center">
+                            <i class="fab fa-apple mr-2 text-lg"></i> Sign in with Apple
+                        </button>
+                        <div class="flex items-center my-4">
+                            <div class="flex-grow border-t border-gray-300 dark:border-gray-600"></div>
+                            <span class="flex-shrink mx-4 text-gray-500 dark:text-gray-400">or use your Email</span>
+                            <div class="flex-grow border-t border-gray-300 dark:border-gray-600"></div>
+                        </div>
+                        <input type="email" placeholder="Email Address" class="w-full p-3 rounded-lg border bg-gray-50 dark:bg-gray-700 border-gray-300 dark:border-gray-600 focus:ring-primary focus:border-primary transition" />
+                        <input type="password" placeholder="Password" class="w-full p-3 rounded-lg border bg-gray-50 dark:bg-gray-700 border-gray-300 dark:border-gray-600 focus:ring-primary focus:border-primary transition" />
+                        <button onclick="handleAuth(true)" class="w-full bg-primary hover:bg-indigo-700 text-white font-bold py-3 rounded-lg transition">
+                            Login
+                        </button>
+                    </div>
+                    <p class="text-sm text-center mt-4">
+                        Don't have an account? <button onclick="handleAuth(false)" class="text-primary hover:underline font-semibold">Sign Up</button>
+                    </p>
+                </div>
+            </section>
+            
+             <!-- PAGE: DASHBOARD -->
+            <section id="page-dashboard" class="page hidden max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" data-page="dashboard">
+                <h2 class="text-3xl font-bold mb-8 text-center">User Dashboard</h2>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <!-- Metrics Panel -->
+                    <div class="lg:col-span-1 p-6 bg-white dark:bg-dark-card rounded-xl shadow-lg border border-gray-100 dark:border-gray-700">
+                        <h3 class="text-xl font-semibold mb-4 border-b pb-3 border-gray-200 dark:border-gray-600">Your Account</h3>
+                        <div class="space-y-3">
+                            <p class="text-sm">Plan: <span class="font-bold text-primary">Free</span> (<button onclick="navigate('pricing')" class="text-xs text-primary hover:underline">Upgrade</button>)</p>
+                            <p class="text-sm">Documents Saved: <span class="font-bold">14</span> / <span class="text-gray-500">Unlimited (Pro)</span></p>
+                            <p class="text-sm">Last Activity: <span class="font-bold">2 hours ago</span></p>
+                            <!-- Future Backend Placeholder -->
+                            <p class="text-xs text-gray-500 mt-4">// POST /api/user/save to save document metadata</p>
+                        </div>
+                         <button onclick="handleLogout()" class="mt-6 w-full bg-red-500 hover:bg-red-600 text-white font-bold py-2 rounded-lg transition">
+                            Logout
+                        </button>
+                    </div>
+
+                    <!-- Document History -->
+                    <div class="lg:col-span-2 p-6 bg-white dark:bg-dark-card rounded-xl shadow-lg border border-gray-100 dark:border-gray-700">
+                        <h3 class="text-xl font-semibold mb-4 border-b pb-3 border-gray-200 dark:border-gray-600">Document History</h3>
+                        <div class="space-y-3">
+                            <!-- History Item 1 -->
+                            <div class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 transition">
+                                <span class="font-medium">Senior Developer Resume</span>
+                                <div class="flex items-center space-x-3 text-sm">
+                                    <span class="text-xs text-gray-500">5 days ago</span>
+                                    <button class="text-primary hover:text-secondary"><i class="fas fa-edit"></i></button>
+                                    <button class="text-red-500 hover:text-red-600"><i class="fas fa-trash"></i></button>
+                                </div>
+                            </div>
+                            <!-- History Item 2 -->
+                            <div class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 transition">
+                                <span class="font-medium">Freelancer Service Contract</span>
+                                <div class="flex items-center space-x-3 text-sm">
+                                    <span class="text-xs text-gray-500">2 weeks ago</span>
+                                    <button class="text-primary hover:text-secondary"><i class="fas fa-edit"></i></button>
+                                    <button class="text-red-500 hover:text-red-600"><i class="fas fa-trash"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                        <p class="text-center text-sm text-gray-500 dark:text-gray-400 mt-6">All documents are securely backed up in the cloud.</p>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- 3. Footer -->
+        <footer class="mt-12 py-8 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-dark-bg">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-sm text-gray-500 dark:text-gray-400">
+                <p class="mb-4">&copy; 2024 DocFusion AI. All rights reserved. | <span class="font-semibold">Write. Generate. Download. Done.</span></p>
+                <div class="space-x-4">
+                    <a href="#" class="hover:text-primary transition">About Us</a>
+                    <a href="#" class="hover:text-primary transition">FAQ</a>
+                    <a href="#" class="hover:text-primary transition">Terms</a>
+                    <a href="#" class="hover:text-primary transition">Privacy</a>
+                    <a href="#" class="hover:text-primary transition">Sitemap (SEO)</a>
+                </div>
+            </div>
+        </footer>
+    </div>
+    
+    <!-- Custom Modal for Messages (No alert/confirm) -->
+    <div id="custom-modal" class="hidden fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-[200] p-4">
+        <div class="bg-white dark:bg-dark-card p-6 rounded-xl shadow-2xl w-full max-w-sm text-center border-t-4 border-primary">
+            <h3 id="modal-title" class="text-xl font-bold mb-4">Message</h3>
+            <p id="modal-message" class="text-sm text-gray-600 dark:text-gray-300 mb-6"></p>
+            <button onclick="document.getElementById('custom-modal').classList.add('hidden')" class="w-full bg-primary hover:bg-indigo-700 text-white font-bold py-2 rounded-lg transition">
+                Got It
+            </button>
+        </div>
+    </div>
+
+<script>
+    // --- Global State and Utility Functions ---
+    let currentPage = 'home';
+    let isGenerating = false;
+    let generationCount = 3; // Free tier limit simulation
+
+    const pages = document.querySelectorAll('.page');
+    const editorContent = document.getElementById('doc-editor-content');
+    const loadingIndicator = document.getElementById('ai-loading');
+    const generateButton = document.getElementById('generate-button');
+    const freeLimitStatus = document.getElementById('free-limit-status');
+    const mobileMenu = document.getElementById('mobile-menu');
+
+    // 1. Dark Mode Logic
+    document.getElementById('dark-mode-toggle').addEventListener('click', () => {
+        document.documentElement.classList.toggle('dark');
+        localStorage.setItem('theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light');
+    });
+
+    // Apply saved theme on load
+    if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.classList.add('dark');
+    }
+
+    // 2. Navigation State Manager
+    function navigate(pageId) {
+        if (isGenerating) {
+            showModal('Hold On', 'The AI is currently generating your document. Please wait a moment.');
+            return;
+        }
+
+        currentPage = pageId;
+        pages.forEach(page => {
+            if (page.id === 'page-' + pageId) {
+                page.classList.remove('hidden');
+                window.scrollTo(0, 0); // Scroll to top on page change
+            } else {
+                page.classList.add('hidden');
+            }
+        });
+        // Hide mobile menu after selection
+        mobileMenu.classList.add('hidden');
+
+        // Update builder status on navigation
+        if (pageId === 'builder') {
+            updateBuilderStatus();
+        }
+    }
+    
+    // Initial load
+    document.addEventListener('DOMContentLoaded', () => {
+        // Show Home page initially
+        navigate('home'); 
+
+        // Mobile Menu Toggle
+        document.getElementById('mobile-menu-button').addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+
+        // Initial check for builder button
+        updateBuilderStatus();
+    });
+
+
+    // 3. Custom Modal Function (replaces alert/confirm)
+    function showModal(title, message) {
+        document.getElementById('modal-title').innerText = title;
+        document.getElementById('modal-message').innerText = message;
+        document.getElementById('custom-modal').classList.remove('hidden');
+    }
+
+    // 4. Builder Status Update
+    function updateBuilderStatus() {
+        if (generationCount <= 0) {
+            generateButton.disabled = true;
+            generateButton.innerText = 'Upgrade for more generations';
+            freeLimitStatus.classList.remove('hidden');
+        } else {
+            generateButton.disabled = false;
+            generateButton.innerHTML = `Generate Document (${generationCount} left) <i class="fas fa-wand-magic-sparkles ml-1"></i>`;
+            freeLimitStatus.classList.add('hidden');
+        }
+    }
+    
+    // 5. Template Selector
+    function selectTemplate(templateName) {
+        navigate('builder');
+        document.getElementById('doc-type').value = templateName.split(' - ')[0];
+        document.getElementById('doc-details').value = `Draft a document using the "${templateName}" template. Focus on the core content and structure.`;
+        showModal('Template Loaded', `Template "${templateName}" has been loaded into the Document Builder. Fill in the remaining details and click Generate.`);
+    }
+
+    // 6. AI Generation Simulation
+    async function handleAIGenerate() {
+        if (generationCount <= 0) {
+            showModal('Limit Reached', 'You have used your free daily generations. Please upgrade to Pro for unlimited access.');
+            return;
+        }
+
+        isGenerating = true;
+        loadingIndicator.classList.remove('hidden');
+        generateButton.disabled = true;
+        editorContent.innerHTML = ''; // Clear content for generation
+
+        const params = {
+            type: document.getElementById('doc-type').value,
+            role: document.getElementById('doc-role').value,
+            industry: document.getElementById('doc-industry').value,
+            tone: document.getElementById('doc-tone').value,
+            details: document.getElementById('doc-details').value,
+        };
+
+        // --- FUTURE AI BACKEND INTEGRATION PLACEHOLDER ---
+        /*
+        const apiKey = ""; 
+        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+        
+        const systemPrompt = `You are DocFusion AI. Your task is to generate a professional, highly structured document based on the user's input. Format the response using professional spacing, headers, and bullet points.`;
+        const userQuery = `Generate a document of type: ${params.type}, for the role: ${params.role}, in the industry: ${params.industry}, using a ${params.tone} tone. Key details: ${params.details}`;
+        
+        const payload = {
+            contents: [{ parts: [{ text: userQuery }] }],
+            systemInstruction: { parts: [{ text: systemPrompt }] },
+            // tools: [{ "google_search": {} }], // Optional grounding for factual doc types
+        };
+
+        try {
+            const response = await fetch(apiUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            const result = await response.json();
+            const generatedText = result.candidates?.[0]?.content?.parts?.[0]?.text || "Error: Could not generate content.";
+            
+            // Render the generated text
+            editorContent.innerHTML = generatedText;
+
+        } catch (error) {
+            console.error("AI API Error:", error);
+            editorContent.innerHTML = `<p class="text-red-500">AI Generation failed. Please check the console for errors.</p>`;
+        } finally {
+            // ... cleanup logic
+        }
+        */
+        // --- END AI BACKEND INTEGRATION PLACEHOLDER ---
+
+        // SIMULATION: Simulate API call delay and result
+        await new Promise(resolve => setTimeout(resolve, 1500)); 
+        
+        const dummyOutput = generateDummyDocument(params);
+        editorContent.innerHTML = dummyOutput;
+        generationCount--;
+        updateBuilderStatus();
+        loadingIndicator.classList.add('hidden');
+        generateButton.disabled = false;
+        isGenerating = false;
+        showModal('Generation Complete!', `Your ${params.type} has been successfully drafted by the AI. Review and edit the document before exporting.`);
+    }
+
+    // Dummy AI Output Function
+    function generateDummyDocument(p) {
+        let content = '';
+        if (p.type.includes('Resume')) {
+            content = `
+                <div class="p-4 border-b border-gray-300 dark:border-gray-700 mb-6">
+                    <h1 class="text-4xl font-extrabold text-primary">${p.role || 'Professional Role'}</h1>
+                    <p class="text-lg text-gray-500">${p.industry || 'General Industry'} Specialist</p>
+                </div>
+                
+                <h2 class="text-2xl font-bold border-b-2 border-primary pb-1 mb-3">PROFESSIONAL SUMMARY</h2>
+                <p class="mb-6">Highly effective and ${p.tone.toLowerCase()} leader with 5+ years of experience in the ${p.industry} sector. Proven ability to ${p.details.split(',')[0] || 'deliver complex projects and drive innovation'}. Seeking to leverage technical expertise to achieve new business milestones.</p>
+
+                <h2 class="text-2xl font-bold border-b-2 border-primary pb-1 mb-3">CORE COMPETENCIES</h2>
+                <ul class="list-disc list-inside space-y-1 mb-6">
+                    <li>Project Management & Agile Methodologies</li>
+                    <li>Full-Stack Development (React, Node, AWS)</li>
+                    <li>Strategic Planning & Executive Communication (${p.tone})</li>
+                </ul>
+
+                <h2 class="text-2xl font-bold border-b-2 border-primary pb-1 mb-3">PROFESSIONAL EXPERIENCE</h2>
+                <h3 class="text-xl font-semibold mt-4">Lead Architect | TechCo Global (2020 - Present)</h3>
+                <ul class="list-disc list-inside space-y-1">
+                    <li>Led the architectural design and development of three core SaaS products.</li>
+                    <li>Mentored a team of 10 developers, improving code quality by 30%.</li>
+                    <li>Achieved 99.99% uptime for critical user-facing applications.</li>
+                </ul>
+            `;
+        } else if (p.type.includes('Contract') || p.type.includes('Legal')) {
+            content = `
+                <div class="p-4 border-b border-gray-300 dark:border-gray-700 mb-6 text-center">
+                    <h1 class="text-4xl font-extrabold text-red-700">NON-DISCLOSURE AGREEMENT</h1>
+                    <p class="text-lg text-gray-500">Effective Date: ${new Date().toLocaleDateString()}</p>
+                </div>
+
+                <h2 class="text-2xl font-bold border-b-2 border-red-700 pb-1 mb-3">1. DEFINITIONS</h2>
+                <p class="text-sm mb-4"><strong>"Confidential Information"</strong> means all non-public information, documentation, and data related to the Disclosing Party's business, including but not limited to proprietary software, marketing plans, and financial data. This agreement is written in a highly ${p.tone.toLowerCase()} tone.</p>
+
+                <h2 class="text-2xl font-bold border-b-2 border-red-700 pb-1 mb-3">2. OBLIGATIONS</h2>
+                <ol class="list-decimal list-inside space-y-1 mb-6">
+                    <li>The Receiving Party agrees to hold and maintain the Confidential Information in strictest confidence.</li>
+                    <li>The Receiving Party shall not, without prior written consent, disclose the Confidential Information to any third party.</li>
+                    <li>The obligations under this Section 2 shall survive the termination of this Agreement for a period of five (5) years.</li>
+                </ol>
+                <p class="text-sm italic mt-8">Note: This is a placeholder. Always consult a legal professional for real agreements.</p>
+            `;
+        } else {
+             content = `
+                <div class="p-4 border-b border-gray-300 dark:border-gray-700 mb-6">
+                    <h1 class="text-4xl font-extrabold text-primary">${p.type} Draft</h1>
+                    <p class="text-lg text-gray-500">Target Role: ${p.role} | Tone: ${p.tone}</p>
+                </div>
+                
+                <h2 class="text-2xl font-bold border-b-2 border-primary pb-1 mb-3">INTRODUCTION</h2>
+                <p class="mb-6">Dear [Recipient Name], I am writing to propose a partnership with your organization in the ${p.industry} sector. Our proposal is structured with a ${p.tone.toLowerCase()} approach to ensure clarity and professional alignment.</p>
+
+                <h2 class="text-2xl font-bold border-b-2 border-primary pb-1 mb-3">KEY PROJECT DETAILS</h2>
+                <p>The details provided were: ${p.details}</p>
+                <ul class="list-disc list-inside space-y-1 mb-6">
+                    <li>The objective is to leverage our service offering to address [Problem A].</li>
+                    <li>The execution will follow a three-phase timeline over six months.</li>
+                    <li>Expected measurable outcome: a 25% increase in [Metric].</li>
+                </ul>
+
+                <p class="mt-8">We look forward to discussing this ${p.type} further. Sincerely, [Your Name]</p>
+            `;
+        }
+
+        return content;
+    }
+
+
+    // 7. AI Rewrite Tools Simulation
+    function handleAITool(tool) {
+        // Only works if there is generated content to edit
+        if (editorContent.innerText.length < 50) {
+            showModal('Editor Empty', 'Please generate or paste some content into the editor before using AI tools.');
+            return;
+        }
+
+        const selection = window.getSelection();
+        let textToEdit = selection.toString().trim();
+        let isSelection = textToEdit.length > 0;
+        
+        let toolTitle = '';
+        let toolResult = '';
+        
+        // Use a simple phrase replacement for simulation
+        if (!isSelection) {
+            // If no selection, target a generic phrase for visual feedback
+            textToEdit = "The core project objectives were highly technical and required significant cross-functional cooperation.";
+        }
+
+        switch (tool) {
+            case 'proofread':
+                toolTitle = 'Proofread & Grammar Check';
+                toolResult = isSelection 
+                    ? `Corrected: "${textToEdit.replace(/was/g, 'were').replace(/alot/g, 'a lot')}"`
+                    : "Correction applied: The core project objectives were highly technical and required significant cross-functional cooperation.";
+                break;
+            case 'formal':
+                toolTitle = 'Tone Transformer: Formal';
+                toolResult = isSelection
+                    ? `Formalized: "We hereby assert that the aforementioned objectives necessitated substantial interdepartmental collaboration and highly specialized technical expertise."`
+                    : "Formalized: We hereby assert that the aforementioned objectives necessitated substantial interdepartmental collaboration and highly specialized technical expertise.";
+                break;
+            case 'shorten':
+                toolTitle = 'Content Shortener';
+                toolResult = isSelection 
+                    ? `Shortened: "${textToEdit.substring(0, 20)}..."`
+                    : "Shortened: Project goals were technical and required team collaboration.";
+                break;
+             case 'expand':
+                toolTitle = 'Content Expander';
+                toolResult = isSelection 
+                    ? `Expanded: "${textToEdit} This required extensive resource planning and executive oversight to ensure all dependencies were met on time and within budget."`
+                    : "Expanded: The core project objectives were highly technical, demanding the application of complex engineering principles and requiring significant cross-functional cooperation across software and hardware teams. The project scope was immense and critical to the company's Q4 revenue goals.";
+                break;
+            case 'format':
+                toolTitle = 'AI Formatting Engine';
+                toolResult = 'AI applied smart formatting: Headers detected, bullet points structured, and professional font/spacing adjusted (simulated).';
+                break;
+        }
+
+        // Apply the change directly to the document for visual feedback if not a general message
+        if (isSelection && toolResult.includes(': "')) {
+            // For a real app, you would use a rich text editor API (like Quill or Tiptap) to replace the selection
+            // For this simulation, we just show the modal result
+        }
+
+        showModal(toolTitle, toolResult);
+
+        // --- FUTURE AI BACKEND INTEGRATION PLACEHOLDER ---
+        /* // Example structure for a rewrite call:
+        const payload = {
+            content: textToEdit,
+            operation: tool,
+            model: "gemini-2.5-flash-preview-09-2025"
+        };
+        fetch('/api/ai/rewrite', { method: 'POST', body: JSON.stringify(payload) });
+        */
+        // --- END AI BACKEND INTEGRATION PLACEHOLDER ---
+    }
+
+    // Standalone tool simulation for AI Tools page
+    function handleAIToolStandalone(tool) {
+        let inputField;
+        let toolTitle = '';
+        let toolResult = '';
+        let input = '';
+
+        if (tool === 'proofread') {
+            inputField = document.getElementById('tool-input-1');
+            input = inputField.value || "This sentence has gramer errors and its a bit messy.";
+            toolTitle = 'Proofread Result';
+            toolResult = `Input: "${input}"\n\nCorrected Output: "This sentence has grammar errors, and it's a bit messy."`;
+        } else if (tool === 'tone-transform') {
+            inputField = document.getElementById('tool-input-2');
+            input = inputField.value || "I need to talk to you about the contract changes.";
+            const tone = document.getElementById('tool-tone-select').value;
+            toolTitle = `${tone} Transformation Result`;
+            toolResult = `Input: "${input}"\n\nTransformed Output (${tone}): "I require an immediate discussion regarding the amendments stipulated in the formal contractual agreement."`;
+        }
+
+        document.getElementById('tool-result-content').innerText = toolResult;
+        document.getElementById('tool-result-modal').classList.remove('hidden');
+    }
+
+    // 8. Export Simulation
+    function handleExport(format) {
+        const docTitle = document.getElementById('doc-type').value;
+
+        // --- FUTURE BACKEND EXPORT INTEGRATION PLACEHOLDER ---
+        /* // Example structure for a PDF export call:
+        const payload = {
+            htmlContent: editorContent.innerHTML,
+            format: format,
+            watermark: (generationCount < 3) // Assume Pro plan has unlimited/no watermark
+        };
+        fetch('/api/export/pdf', { method: 'POST', body: JSON.stringify(payload) })
+            .then(res => res.blob())
+            .then(blob => {
+                // Trigger download
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.style.display = 'none';
+                a.href = url;
+                a.download = \`${docTitle}.\${format}\`;
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+            });
+        */
+        // --- END BACKEND EXPORT INTEGRATION PLACEHOLDER ---
+        
+        let message;
+        if (format === 'copy') {
+            // Simple clipboard copy (using execCommand for broader iFrame compatibility)
+            const el = document.createElement('textarea');
+            el.value = editorContent.innerText;
+            document.body.appendChild(el);
+            el.select();
+            document.execCommand('copy');
+            document.body.removeChild(el);
+            message = 'Document text successfully copied to your clipboard!';
+        } else if (format === 'pdf' && generationCount <= 0) {
+            message = `You are on the Free Plan. Your PDF (${docTitle}.pdf) will be downloaded with a **DocFusion AI Watermark**. Upgrade to Pro to remove it.`;
+        } else {
+             message = `Simulation: Downloading your document, "${docTitle}.${format}", now. In a live environment, a server would process the HTML into a perfectly formatted ${format.toUpperCase()} file.`;
+        }
+
+        showModal(`Exporting as ${format.toUpperCase()}`, message);
+    }
+    
+    // 9. Auth Simulation
+    function handleAuth(isLogin) {
+        const action = isLogin ? 'Login' : 'Signup';
+        showModal(action + ' Simulation', `Thank you for attempting to ${action}. This feature requires a backend (Firebase/Supabase) to handle secure user authentication and document saving. You have been redirected to the dashboard placeholder.`);
+        navigate('dashboard');
+    }
+
+    function handleLogout() {
+        showModal('Logout', 'You have been successfully logged out (simulation).');
+        navigate('auth');
+    }
+
+    // 10. Pricing Toggle Simulation
+    document.getElementById('monthly-toggle').addEventListener('click', () => {
+        document.getElementById('monthly-toggle').classList.add('bg-primary', 'text-white', 'shadow-md');
+        document.getElementById('monthly-toggle').classList.remove('bg-gray-300', 'dark:bg-gray-600', 'text-gray-700', 'dark:text-gray-300');
+        
+        document.getElementById('yearly-toggle').classList.remove('bg-primary', 'text-white', 'shadow-md');
+        document.getElementById('yearly-toggle').classList.add('text-gray-700', 'dark:text-gray-300', 'hover:bg-gray-300', 'dark:hover:bg-gray-600');
+        
+        document.getElementById('pro-price').innerHTML = '$9.99<span class="text-base font-medium text-gray-500 dark:text-gray-400">/month</span>';
+    });
+
+    document.getElementById('yearly-toggle').addEventListener('click', () => {
+        document.getElementById('yearly-toggle').classList.add('bg-primary', 'text-white', 'shadow-md');
+        document.getElementById('yearly-toggle').classList.remove('bg-gray-300', 'dark:bg-gray-600', 'text-gray-700', 'dark:text-gray-300', 'hover:bg-gray-300', 'dark:hover:bg-gray-600');
+        
+        document.getElementById('monthly-toggle').classList.remove('bg-primary', 'text-white', 'shadow-md');
+        document.getElementById('monthly-toggle').classList.add('text-gray-700', 'dark:text-gray-300', 'hover:bg-gray-300', 'dark:hover:bg-gray-600');
+        
+        // $9.99 * 12 * 0.60 (40% discount) = $71.93 / 12 = $5.99/mo (billed annually)
+        document.getElementById('pro-price').innerHTML = '$5.99<span class="text-base font-medium text-gray-500 dark:text-gray-400">/month (Billed Yearly)</span>';
+    });
+
+</script>
+</body>
 </html>
 
